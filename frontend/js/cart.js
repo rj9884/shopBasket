@@ -6,14 +6,15 @@ const cartTotalEl = document.getElementById('cartTotal');
 const token = localStorage.getItem('token');
 
 const cartFallbackImageMap = {
-    Laptops: 'https://source.unsplash.com/featured/500x500/?laptop',
-    Smartphones: 'https://source.unsplash.com/featured/500x500/?smartphone',
-    Tablets: 'https://source.unsplash.com/featured/500x500/?tablet',
-    Headphones: 'https://source.unsplash.com/featured/500x500/?headphones',
-    Smartwatches: 'https://source.unsplash.com/featured/500x500/?smartwatch',
-    Gaming: 'https://source.unsplash.com/featured/500x500/?gaming-console',
-    Electronics: 'https://source.unsplash.com/featured/500x500/?electronics'
+    Laptops: 'images/laptop_sample.png',
+    Smartphones: 'images/smartphone_sample.png',
+    Tablets: 'images/tablet_sample.png',
+    Headphones: 'images/headphones_sample.png',
+    Smartwatches: 'images/smartwatch_sample.png',
+    Gaming: 'images/gaming_sample.png',
+    Electronics: 'images/laptop_sample.png'
 };
+const cartGenericFallbackImage = 'images/laptop_sample.png';
 
 // We mix dummyCart from local storage with real DB cart
 async function loadCart() {
@@ -69,7 +70,7 @@ function renderCart(cartItems) {
 
     cartDiv.innerHTML = cartItems.map((c, index) => `
         <div class="cart-item-row">
-            <img src="${c.image_url}" alt="${c.name}" class="cart-item-img" onerror="this.onerror=null;this.src='${cartFallbackImageMap[c.category] || cartFallbackImageMap.Electronics}'">
+            <img src="${c.image_url}" alt="${c.name}" class="cart-item-img" onerror="this.onerror=null;this.src='${cartGenericFallbackImage}'">
             <div class="cart-item-details">
                 <div class="cart-item-name">${c.name}</div>
                 <div style="color: var(--text-muted); font-size: 0.9em; margin-bottom: 12px;">Category: ${c.category || 'N/A'}</div>
