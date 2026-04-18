@@ -7,9 +7,10 @@ export default (db) => {
   router.get('/', async (req, res) => {
     try {
       const [rows] = await db.execute(`
-        SELECT p.*, c.name AS category 
+        SELECT p.*, c.name AS category, i.quantity 
         FROM Products p 
         LEFT JOIN Categories c ON p.category_id = c.category_id
+        LEFT JOIN Inventory i ON p.product_id = i.product_id
       `);
       res.json(rows);
     } catch (error) {
@@ -23,9 +24,10 @@ export default (db) => {
     const { id } = req.params;
     try {
       const [rows] = await db.execute(`
-        SELECT p.*, c.name AS category 
+        SELECT p.*, c.name AS category, i.quantity 
         FROM Products p 
         LEFT JOIN Categories c ON p.category_id = c.category_id 
+        LEFT JOIN Inventory i ON p.product_id = i.product_id
         WHERE p.product_id = ?
       `, [id]);
       if (rows.length === 0) {

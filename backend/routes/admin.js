@@ -19,16 +19,13 @@ export default (db, authenticateToken) => {
   // GET /admin/stats — summary stats for admin dashboard
   router.get('/stats', async (req, res) => {
     try {
-      const [[userCount]] = await db.execute('SELECT COUNT(*) AS total_users FROM Users');
+      const [[summaryStats]] = await db.execute('SELECT COUNT(*) AS total_users, IFNULL(SUM(total_spent), 0) AS total_revenue FROM User_Summary');
       const [[orderCount]] = await db.execute('SELECT COUNT(*) AS total_orders FROM Orders');
-      const [[revenue]] = await db.execute(
-        "SELECT IFNULL(SUM(total_amount), 0) AS total_revenue FROM Orders WHERE status != 'Cancelled'"
-      );
 
       res.json({
-        total_users: userCount.total_users,
+        total_users: summaryStats.total_users,
         total_orders: orderCount.total_orders,
-        total_revenue: revenue.total_revenue
+        total_revenue: summaryStats.total_revenue
       });
     } catch (error) {
       console.error('DB error in GET /admin/stats:', error.message);

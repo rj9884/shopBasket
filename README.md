@@ -170,8 +170,23 @@ Key tables include:
 - `DELETE /cart/remove/:id` - Remove item from cart
 
 ### Orders
-- `POST /orders` - Place new order
+- `POST /orders/place` - Place new order (Triggering PlaceOrder procedure)
 - `GET /orders` - Get user's order history
+- `GET /orders/:id` - Get order details
+
+### Addresses
+- `GET /addresses` - Fetch user's saved addresses
+- `POST /addresses/add` - Add a new shipping address
+
+### Reviews & Wishlist
+- `GET /reviews/:product_id` - Fetch reviews for a product
+- `POST /reviews/add` - Submit a product review
+- `GET /wishlist` - View wishlist
+- `POST /wishlist/add` - Add product to wishlist
+- `DELETE /wishlist/remove` - Remove product from wishlist
+
+### Coupons
+- `POST /coupons/validate` - Validate a discount coupon
 
 
 ## Troubleshooting
@@ -216,6 +231,7 @@ taskkill /PID <PID> /F
 
 ## Notes
 
-- Sample passwords are not hashed; use bcrypt for production.
-- For demo purposes, `address_id` is hardcoded in checkout.
-- Admin analytics endpoint `/admin/top-products` requires login.
+- Passwords are securely hashed using bcrypt.
+- Inventory is tracked automatically via database triggers (`check_stock_before_order`, `update_inventory_after_order`).
+- Admin analytics natively utilize database views (`Top_Products`, `User_Summary`).
+- Normalization techniques (1NF, 2NF, 3NF) are strictly adhered to across both DB schema and backend logic.

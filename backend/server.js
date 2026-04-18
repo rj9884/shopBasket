@@ -13,6 +13,10 @@ import products from './routes/products.js';
 import cart from './routes/cart.js';
 import orders from './routes/orders.js';
 import admin from './routes/admin.js';
+import addresses from './routes/addresses.js';
+import reviews from './routes/reviews.js';
+import coupons from './routes/coupons.js';
+import wishlist from './routes/wishlist.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -41,6 +45,10 @@ app.use('/products', products(dbPool));
 app.use('/cart', cart(dbPool, authenticateToken));
 app.use('/orders', orders(dbPool, authenticateToken));
 app.use('/admin', admin(dbPool, authenticateToken));
+app.use('/addresses', addresses(dbPool, authenticateToken));
+app.use('/reviews', reviews(dbPool, authenticateToken));
+app.use('/coupons', coupons(dbPool, authenticateToken));
+app.use('/wishlist', wishlist(dbPool, authenticateToken));
 
 // Startup: verify DB connection before accepting requests
 try {

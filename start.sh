@@ -37,7 +37,6 @@ fi
 
 # Start backend server in background
 echo "🖥️  Starting backend server..."
-cd backend
 npm start &
 BACKEND_PID=$!
 cd ..

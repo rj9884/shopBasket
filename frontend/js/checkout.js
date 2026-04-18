@@ -22,12 +22,92 @@ paymentRadios.forEach(radio => {
     });
 });
 
+const savedAddressesSelect = document.getElementById('savedAddresses');
+const newAddressForm = document.getElementById('newAddressForm');
+const savedAddressesSection = document.getElementById('savedAddressesSection');
+
+// Load addresses from DB
+async function loadAddresses() {
+    if (!token) return;
+    try {
+        const res = await fetch('http://localhost:3000/addresses', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+            const addresses = await res.json();
+            if (addresses.length > 0) {
+                savedAddressesSection.style.display = 'block';
+                addresses.forEach(addr => {
+                    const option = document.createElement('option');
+                    option.value = addr.address_id;
+                    option.textContent = `${addr.street}, ${addr.city}, ${addr.zip}`;
+                    savedAddressesSelect.appendChild(option);
+                });
+                
+                // Select the first saved address by default
+                savedAddressesSelect.value = addresses[0].address_id;
+                newAddressForm.style.display = 'none'; // Hide new address form initially
+            }
+        }
+    } catch (err) {
+        console.error('Failed to load addresses:', err);
+    }
+}
+
+savedAddressesSelect.addEventListener('change', () => {
+    if (savedAddressesSelect.value === 'new') {
+        newAddressForm.style.display = 'grid'; // Form grid
+    } else {
+        newAddressForm.style.display = 'none';
+    }
+});
+
+loadAddresses();
+
 checkoutForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    // We get values primarily for visual fullness or future API extensions
-    const street = document.getElementById('street').value;
-    const city = document.getElementById('city').value;
+    let finalAddressId = null;
+
+    if (savedAddressesSelect.value && savedAddressesSelect.value !== 'new') {
+        finalAddressId = savedAddressesSelect.value;
+    } else {
+        // User wants to add a new address
+        const street = document.getElementById('street').value;
+        const city = document.getElementById('city').value;
+        const state = document.getElementById('state').value;
+        const zip = document.getElementById('zip').value;
+        const country = document.getElementById('country').value;
+
+        if (!street || !city || !zip) {
+            alert('Please fill out street, city, and zip code.');
+            return;
+        }
+
+        try {
+            const addrRes = await fetch('http://localhost:3000/addresses/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ street, city, state, zip, country })
+            });
+
+            const addrData = await addrRes.json();
+            if (addrRes.ok) {
+                finalAddressId = addrData.address_id;
+            } else {
+                alert('Failed to save address: ' + addrData.error);
+                return;
+            }
+        } catch (err) {
+            console.error('Error saving address:', err);
+            alert('Error saving address. Please try again.');
+            return;
+        }
+    }
+
     const paymentMethodValue = document.querySelector('input[name="paymentMethod"]:checked').value;
     const paymentProviderInfo = paymentMethodValue === 'online_upi' ? upiIdInput.value : 'COD';
 
@@ -62,7 +142,7 @@ checkoutForm.addEventListener('submit', async (e) => {
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({ 
-                    address_id: 1, // hardcoded per previous simple implementation
+                    address_id: finalAddressId,
                     payment_method: paymentMethodValue, 
                     payment_provider: paymentProviderInfo 
                 })
